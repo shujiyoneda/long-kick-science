@@ -1,0 +1,14 @@
+---
+import '../styles/global.css';
+import 'katex/dist/katex.min.css';
+import {url} from '../lib/paths';
+interface Props { title?:string; description?:string; }
+const {title='ロングキックを科学する',description='中高生サッカー選手のための物理アカデミー。数式を導き、軌道を試し、キックを考える。'}=Astro.props;
+const pathname=Astro.url.pathname;
+---
+<!doctype html><html lang="ja"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content={description}/><meta name="theme-color" content="#142b30"/><title>{title==='ロングキックを科学する'?title:`${title} | ロングキックを科学する`}</title><link rel="icon" href={url('favicon.svg')} type="image/svg+xml"/>{Astro.site && <link rel="canonical" href={new URL(pathname,Astro.site)}/>}</head><body>
+<a class="skip" href="#main">本文へ移動</a>
+<header class="site-header"><div class="header-inner"><a class="brand" href={url()} aria-label="ロングキックを科学する ホーム"><span class="brand-symbol" aria-hidden="true">↗</span><span>ロングキックを科学する<small>LONG KICK SCIENCE LAB</small></span></a><nav aria-label="メインナビゲーション"><a href={url('chapters/')} aria-current={pathname.includes('/chapters/')?'page':undefined}>講座一覧</a><a href={url('simulator/')} aria-current={pathname.includes('/simulator/')?'page':undefined}>シミュレーター</a><a href={url('about/')} aria-current={pathname.includes('/about/')?'page':undefined}>このサイトについて</a></nav></div></header>
+<main id="main"><slot/></main>
+<footer class="site-footer"><div class="container footer-grid"><div><a class="footer-brand" href={url()}>ロングキックを科学する <span>↗</span></a><p>「なんとなく」を、物理でほどく。</p><small>PHYSICS FOR FOOTBALL PLAYERS</small></div><div><a href={url('chapters/')}>全8章・24講座</a><a href={url('references/')}>参考文献</a><a href={url('about/')}>モデルと学び方</a><p class="muted">Phase 1・2 ／ 3講座公開・21講座準備中</p></div></div></footer>
+</body></html>

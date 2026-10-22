@@ -1,0 +1,6 @@
+---
+interface Props { kind:'model'|'evidence'|'hypothesis'; }
+const labels={model:'理論モデル',evidence:'実験的知見',hypothesis:'技術的仮説・要検証'};
+const {kind}=Astro.props;
+---
+<aside class:list={['evidence',kind]}><span class="tag">{labels[kind]}</span><div><slot/></div></aside>

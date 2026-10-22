@@ -1,0 +1,6 @@
+---
+import Base from '../../layouts/Base.astro';import LessonCard from '../../components/LessonCard.astro';import {chapters} from '../../data/curriculum';import {url} from '../../lib/paths';
+export function getStaticPaths(){return chapters.map(chapter=>({params:{id:chapter.id},props:{chapter}}));}
+const {chapter:c}=Astro.props;
+---
+<Base title={`Chapter ${c.id} ${c.title}`}><section class="chapter-hero"><div class="container"><a class="back-link" href={url('chapters/')}>← 全講座へ</a><p class="eyebrow">CHAPTER {c.id} / {c.label}</p><h1>{c.title}</h1><p class="lead">{c.description}</p><p class="status">{c.number===6?'全3講座公開中':'本文未公開：学習目標・詳細アウトラインを掲載'}</p></div></section><section class="section container"><div class="section-heading"><div><span class="eyebrow">THREE STEPS</span><h2>基礎から、もう一歩先へ。</h2><p>基礎 → 応用 → 発展の順に進みます。</p></div></div><div class="lesson-grid">{c.lessons.map(l=><LessonCard lesson={l}/>)}</div></section><section class="container note-section"><h2>この章の到達目標</h2><ol>{c.lessons.map(l=><li>{l.goal}</li>)}</ol>{c.number===6 && <a class="button dark-button" href={url('simulator/')}>飛距離シミュレーターで実験する ↗</a>}<p>各講座は、問い・予想・高校物理・導出・数値計算・発展解析・技術応用・理解度チェックの8セクションで構成します。</p></section></Base>

@@ -1,0 +1,10 @@
+---
+import {projectile, optimalAngle, dragTrajectory} from '../lib/physics';
+interface Props { kind:'basic'|'angles'|'drag'; }
+const {kind}=Astro.props;
+const r=projectile({speed:25,angle:40,height:0});
+const d=kind==='drag'?dragTrajectory({speed:25,angle:40,height:0}):[];
+---
+{kind==='basic' && <div class="table-scroll" tabindex="0" role="region" aria-label="数値の表。横にスクロールできます"><table><caption>初速度 25 m/s・角度 40°・高さ 0 m、g = 9.81 m/s²</caption><thead><tr><th scope="col">計算量</th><th scope="col">結果</th><th scope="col">意味</th></tr></thead><tbody><tr><th scope="row">水平初速度</th><td>{r.vx.toFixed(3)} m/s</td><td>水平移動の速さ</td></tr><tr><th scope="row">鉛直初速度</th><td>{r.vy.toFixed(3)} m/s</td><td>上向きの速さ</td></tr><tr><th scope="row">滞空時間</th><td>{r.time.toFixed(3)} s</td><td>放出から着地まで</td></tr><tr><th scope="row">飛距離</th><td>{r.range.toFixed(3)} m</td><td>最初の着地点まで</td></tr><tr><th scope="row">最高到達点</th><td>{r.peak.toFixed(3)} m</td><td>着地面からの高さ</td></tr></tbody></table></div>}
+{kind==='angles' && <div class="table-scroll" tabindex="0" role="region" aria-label="数値の表。横にスクロールできます"><table><caption>初速度 25 m/s、高さ 0 m、空気抵抗なし</caption><thead><tr><th>角度</th><th>飛距離</th><th>滞空時間</th><th>最高点</th></tr></thead><tbody>{[30,40,45,50,60].map(angle=>{const x=projectile({speed:25,angle,height:0});return <tr><th scope="row">{angle}°</th><td>{x.range.toFixed(2)} m</td><td>{x.time.toFixed(2)} s</td><td>{x.peak.toFixed(2)} m</td></tr>})}</tbody></table><p>高さ 1.0 m で初速度を固定すると、最適角度は {optimalAngle(25,1).toFixed(2)}°。数値は理論モデルの値。</p></div>}
+{kind==='drag' && <div class="table-scroll" tabindex="0" role="region" aria-label="数値の表。横にスクロールできます"><table><caption>教育用計算例：25 m/s・40°・高さ 0 m</caption><thead><tr><th>モデル</th><th>飛距離</th><th>滞空時間</th><th>最高点</th></tr></thead><tbody><tr><th scope="row">空気抵抗なし</th><td>{r.range.toFixed(2)} m</td><td>{r.time.toFixed(2)} s</td><td>{r.peak.toFixed(2)} m</td></tr><tr><th scope="row">一定抗力係数 0.25</th><td>{d.at(-1)!.x.toFixed(2)} m</td><td>{d.at(-1)!.t.toFixed(2)} s</td><td>{Math.max(...d.map(x=>x.y)).toFixed(2)} m</td></tr></tbody></table><p>質量 0.43 kg、半径 0.11 m、空気密度 1.20 kg/m³。係数は説明用の仮定で、特定製品の実測値ではありません。RK4、刻み 0.002 s、着地は線形補間。</p></div>}

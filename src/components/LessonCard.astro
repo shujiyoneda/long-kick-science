@@ -1,0 +1,6 @@
+---
+import {url} from '../lib/paths';
+interface Props { lesson:{id:string;title:string;level:string;goal:string;status:string;minutes:number;}; }
+const {lesson:l}=Astro.props;
+---
+<a class:list={['lesson-card',{published:l.status==='published'}]} href={url(`learn/${l.id}/`)}><div class="card-meta"><span class="mono">{l.id}</span><span>{l.level}</span><span class:list={['status',{live:l.status==='published'}]}>{l.status==='published'?'公開中':'本文未公開'}</span></div><h3>{l.title}</h3><p>{l.goal}</p><span class="card-end">{l.status==='published'?`講座を読む・約${l.minutes}分`:'学習目標・アウトラインを見る'} <span aria-hidden="true">↗</span></span></a>

@@ -1,0 +1,31 @@
+---
+import {projectile,trajectory,dragTrajectory} from '../lib/physics';
+interface Props { kind?:'projectile'|'angles'|'drag'; dark?:boolean; }
+const {kind='projectile',dark=false}=Astro.props;
+const base={speed:25,angle:40,height:0};
+const main=projectile(base);
+const sx=(x:number)=>60+x*8.8, sy=(y:number)=>290-y*8.8;
+const path=(pts:{x:number;y:number}[])=>pts.map((p,i)=>`${i?'L':'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ');
+const title=kind==='angles'?'同じ初速度、異なる角度':kind==='drag'?'抵抗の有無で軌道を比較':'水平と鉛直に分けて考える';
+const desc=kind==='projectile'?'初速度25 m/s、角度40度、高さ0 mの放物線。初速度を水平成分と鉛直成分に分解。最高点でも重力は下向き。':kind==='angles'?'初速度25 m/s、高さ0 mで角度30度、45度、60度を比較。30度と60度の飛距離は等しく45度が最大。':'初速度25 m/s、角度40度、高さ0 m。無抵抗の放物線と一定抗力係数0.25のRK4計算。両軸同じ縮尺。実測値ではない。';
+const drag=kind==='drag'?dragTrajectory(base):[];
+---
+<figure class:list={['physics-figure',{dark}]}>
+  <svg viewBox="0 0 700 365" role="img" aria-label={title} xmlns="http://www.w3.org/2000/svg">
+    <desc>{desc}</desc>
+    <defs><pattern id={`grid-${kind}-${dark}`} width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0V44" fill="none" stroke="currentColor" opacity=".09"/></pattern></defs>
+    <rect width="700" height="365" fill={`url(#grid-${kind}-${dark})`}/>
+    <g fill="none" stroke="currentColor" opacity=".45"><path d="M60 28V290H665"/><path d="m55 36 5-8 5 8m-8 249 8 5-8 5"/></g>
+    <g fill="currentColor" font-size="13" font-family="sans-serif"><text x="18" y="31">y / m</text><text x="635" y="320">x / m</text>{[0,20,40,60].map(x=><text x={sx(x)-5} y="310">{x}</text>)}{[10,20].map(y=><text x="28" y={sy(y)+4}>{y}</text>)}</g>
+    {kind==='angles' ? [30,45,60].map((angle,i)=><g><path d={path(trajectory({...base,angle}))} fill="none" stroke={['#b37626','#288370','#5b62c9'][i]} stroke-width="3" stroke-dasharray={i===0?'7 5':i===2?'2 5':undefined}/><text x={110+i*185} y="345" fill={['#b37626','#288370','#5b62c9'][i]} font-size="16">{angle}°</text></g>) : <>
+    <path d={path(trajectory(base))} fill="none" stroke={dark?'#d3f584':'#287365'} stroke-width="3" stroke-dasharray={kind==='drag'?'7 5':undefined}/>
+    {kind==='drag' ? <><path d={path(drag)} fill="none" stroke="#b37626" stroke-width="3"/><g font-size="14"><text x="130" y="343" fill="#287365">破線：空気抵抗なし</text><text x="390" y="343" fill="#b37626">実線：一定 Cd の抗力</text></g></> : <>
+    <circle cx="60" cy="290" r="7" fill={dark?'#d3f584':'#287365'}/><circle cx={sx(main.vx*main.apexTime)} cy={sy(main.peak)} r="6" fill={dark?'#d3f584':'#287365'}/>
+    <g fill="none" stroke={dark?'#d3f584':'#287365'} stroke-width="2"><path d="M60 290L155 210m-14 4 14-4-5 14"/><path d="M60 290H155m-10-5 10 5-10 5M155 290V210m-5 10 5-10 5 10" stroke-dasharray="5 4"/><path d="M100 290A40 40 0 0 0 90.6 264.3"/></g>
+    <g fill="currentColor" font-size="15"><text x="93" y="205">v₀</text><text x="100" y="279">40°</text><text x="90" y="340">v₀ cos θ</text><text x="165" y="257">v₀ sin θ</text><text x="355" y="90">最高点：vᵧ = 0</text></g>
+    <path d={`M${sx(main.vx*main.apexTime)} ${sy(main.peak)+12}v54m-5-10 5 10 5-10`} fill="none" stroke={dark?'#f2c18b':'#9e4f23'} stroke-width="2"/><text x={sx(main.vx*main.apexTime)+13} y={sy(main.peak)+55} font-size="15" fill="currentColor">重力 mg</text>
+    </>}
+    </>}
+  </svg>
+  <figcaption>{title}。{desc} 図はコードから生成したオリジナルSVG。</figcaption>
+</figure>

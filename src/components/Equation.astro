@@ -1,0 +1,7 @@
+---
+import katex from 'katex';
+interface Props { tex:string; symbols:string; conditions?:string; }
+const {tex,symbols,conditions='空気抵抗・揚力なし、一定重力、平らな着地面。SI単位系。'}=Astro.props;
+const html=katex.renderToString(tex,{displayMode:true,throwOnError:true,output:'htmlAndMathml'});
+---
+<div class="equation"><div class="math-scroll" tabindex="0" role="region" aria-label="数式。横にスクロールできます" set:html={html}/><p><strong>記号・単位</strong> {symbols}</p><p><strong>成立条件</strong> {conditions}</p></div>
