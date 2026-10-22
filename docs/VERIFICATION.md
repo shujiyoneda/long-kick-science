@@ -1,6 +1,6 @@
 # 検証結果・未確認事項
 
-初期制作の検証日：2026年10月22日。2026年10月23日に `shujiyoneda/long-kick-science` への登録とCI検証を準備。サイトの外部公開は実行しない。GitHub上の最新検証はActions → Validateを参照。
+初期制作の検証日：2026年10月22日。2026年10月23日に `shujiyoneda/long-kick-science` のmainへソースを登録し、GitHub ActionsでのCI検証に合格。サイトは外部公開していない。
 
 ## 実施済み
 
@@ -8,6 +8,7 @@
 |---|---|---|
 |Astro/TypeScriptチェック|合格|エラー0・警告0|
 |Vitest|97件合格|解析解、境界条件、保存量、最適角、RK4、本文構成、KaTeX|
+|Playwright CLI|18件合格|GitHub Actions上のデスクトップChromium・Pixel 7相当。導線、入力、描画、リセット、不正値、表、表示、axe|
 |静的ビルド|成功|38 HTMLページ|
 |内部リンク・アンカー・アセット|合格|全38ページ。本文公開3/未公開21の表示を含む|
 |GitHub Pages相当のサブパス|合格|`/long-kick-science`をbaseとしてビルド・リンク検査|
@@ -21,13 +22,19 @@
 
 ## Playwright
 
-デスクトップChromiumとPixel 7相当の設定で18ケースを定義し、GitHub ActionsのValidateから実行する構成です。本環境では`playwright install chromium`で配布ファイルの取得が完了せず、Playwright CLIのブラウザーテストは未実行です。合格済みとして扱っていません。実行方法はREADME参照。
+初期制作時にはローカル環境でブラウザー配布ファイルを取得できませんでした。その後、2026年10月23日にGitHub ActionsのValidateでPlaywright CLIを実行し、18件すべてに合格しました。型チェック、97件の単体テスト、38ページのビルド・リンク検査、公開用サブパスの検査も成功しています。
+
+検証したアプリケーションのコミット：`37f17298be95ad9ab2260b6b772cce74dd81a365`。
+
+[成功したValidate実行](https://github.com/shujiyoneda/long-kick-science/actions/runs/39858294318)
+
+テスト用サーバーはPlaywrightのwebServer設定が起動・終了し、サブパスのビルドと並行稼働させません。実行方法はREADME参照。
 
 ## 未確認
 
 - iOS Safari、Android Chromeでの実機操作、画面回転、モバイルキーボード。
 - スクリーンリーダーでの数式・図・入力結果の読み上げ。
-- 公開URLでのPages設定・表示・キャッシュ更新。Actionsの実行結果はGitHub上で別途確認。
+- 公開URLでのPages設定・表示・キャッシュ更新。公開用ワークフローは未実行。
 - 外部参考文献リンクの将来の可用性。主要出典の内容・書誌は制作時に確認。
 - 実球の飛距離に対する予測精度。無抵抗モデルは現実の予測器ではない。
 - 「最終サイト設計書 Version 1.0」の独立した原本全文との逐語照合。取得できた会話内容と今回の制作指示に基づく。
