@@ -39,4 +39,4 @@ SVGの位置軸は横・縦同じ縮尺。力・速度矢印は方向と成分�
 
 ## 未確認
 
-実球・実選手への予測精度、iOS Safari/Android Chromeの実機、スクリーンリーダーによる数式読み上げ、独立した研究者による査読。原本Version 1.0全文との逐語照合。GitHub上でのActions実行・公開URLでの挙動。
+実球・実選手への予測精度、iOS Safari/Android Chromeの実機、スクリーンリーダーによる数式読み上げ、独立した研究者による査読。原本Version 1.0全文との逐語照合。GitHub Actionsでの初期CIは検証済み。Chapter 07追加の詳細は`CHAPTER07-QA.md`。

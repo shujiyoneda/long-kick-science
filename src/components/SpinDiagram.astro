@@ -1,0 +1,40 @@
+---
+import {flightComparison} from '../lib/spin';
+interface Props{kind:'impact'|'magnus'|'flight';}
+const {kind}=Astro.props;
+const title=kind==='impact'?'回転を決めるのは、中心から力の作用線までの距離':kind==='magnus'?'バックスピン：速度・揚力・重力の向き':'抗力と揚力を合わせた飛行の比較';
+const description=kind==='impact'?'側面図。中心Cの下側へ右向きの力積Jを与える。作用線と中心の垂直距離bが腕。角力積は紙面手前向きで、反時計回りの回転を生む。':kind==='magnus'?'側面図。右をx、上をy、紙面手前をzの正とする。右上へ進み反時計回りに回転する球の通常のマグヌス力は左上向き。抗力は左下、重力は真下。力の矢印の長さは大きさを表さない。':'初速度25 m/sの抗力のみ、揚力係数0.10、0.20、および初速度22.5 m/s・揚力係数0.20を比較。すべて40度・高さ0・抗力係数0.25。水平と鉛直は同じ縮尺。';
+const sx=(x:number)=>48+x*9.5,sy=(y:number)=>290-y*9.5;
+const cases=kind==='flight'?flightComparison():[];
+---
+<figure class="physics-figure">
+<svg viewBox={kind==='flight'?'0 0 700 420':'0 0 700 350'} role="img" aria-label={title} xmlns="http://www.w3.org/2000/svg">
+<desc>{description}</desc>
+<defs><marker id={`spin-arrow-${kind}`} markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0L6 3L0 6" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker></defs>
+{kind==='impact'&&<>
+<circle cx="340" cy="155" r="100" fill="#eaf0e4" stroke="#287365" stroke-width="2"/><circle cx="340" cy="155" r="4" fill="#142b30"/>
+<path d="M80 210H600" stroke="#596a69" stroke-dasharray="5 5" fill="none"/>
+<path d="M135 210H255" stroke="#9e4f23" stroke-width="4" marker-end={`url(#spin-arrow-${kind})`}/>
+<path d="M340 155V210M331 155H349M331 210H349" fill="none" stroke="#142b30" stroke-width="2"/>
+<path d="M284 244A105 105 0 0 0 440 155" fill="none" stroke="#287365" stroke-width="3" marker-end={`url(#spin-arrow-${kind})`}/>
+<g fill="#142b30" font-size="17"><text x="347" y="149">C（中心）</text><text x="353" y="192">b</text><text x="130" y="192">力積 J →</text><text x="470" y="235">力積の作用線</text><text x="400" y="285">反時計回り</text><text x="70" y="322">腕 b は中心から作用線までの垂直距離</text></g>
+<circle cx="85" cy="70" r="12" fill="none" stroke="#142b30"/><circle cx="85" cy="70" r="3" fill="#142b30"/><text x="108" y="76" fill="#142b30" font-size="16">+z：紙面手前</text>
+</>}
+{kind==='magnus'&&<>
+<circle cx="335" cy="170" r="57" fill="#eaf0e4" stroke="#287365" stroke-width="2"/>
+<g fill="none" stroke-width="3" marker-end={`url(#spin-arrow-${kind})`}>
+<path d="M335 170L500 75" stroke="#287365"/><path d="M335 170L259 38" stroke="#6953a0"/><path d="M335 170L203 246" stroke="#9e4f23"/><path d="M335 170V310" stroke="#142b30"/>
+<path d="M384 190A53 53 0 1 0 285 155" stroke="#287365"/>
+</g>
+<g fill="#142b30" font-size="17"><text x="475" y="57">速度 v</text><text x="140" y="35">揚力 L：速度に垂直</text><text x="70" y="271">抗力 D：速度と逆</text><text x="354" y="307">重力 mg</text><text x="407" y="200">ω：+z</text><text x="407" y="224">バックスピン</text></g>
+<path d="M65 320H150M65 320V235" fill="none" stroke="#142b30" stroke-width="2" marker-end={`url(#spin-arrow-${kind})`}/><g font-size="16" fill="#142b30"><text x="160" y="325">x</text><text x="45" y="230">y</text><text x="485" y="325">側面図・方向模式図</text></g>
+</>}
+{kind==='flight'&&<>
+<g stroke="#dce2d9" fill="none">{[0,10,20].map(y=><path d={`M48 ${sy(y)}H675`}/>)}{[0,20,40,60].map(x=><path d={`M${sx(x)} 30V290`}/>)}</g>
+<path d="M48 30V290H675" fill="none" stroke="#596a69"/>
+<g font-size="14" fill="#142b30"><text x="10" y="25">y / m</text><text x="630" y="321">x / m</text>{[0,20,40,60].map(x=><text x={sx(x)-5} y="310">{x}</text>)}{[10,20].map(y=><text x="15" y={sy(y)+5}>{y}</text>)}</g>
+{cases.map((c,i)=><><path d={c.points.filter((_,j)=>j%8===0||j===c.points.length-1).map((p,j)=>`${j?'L':'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ')} fill="none" stroke={c.color} stroke-width="3" stroke-dasharray={c.dash}/><path d={`M${60+(i%2)*325} ${355+Math.floor(i/2)*38}h36`} stroke={c.color} stroke-width="3" stroke-dasharray={c.dash}/><text x={105+(i%2)*325} y={360+Math.floor(i/2)*38} font-size="16" fill={c.color}>{c.label}</text></>)}
+</>}
+</svg>
+<figcaption>{title}。{description} {kind==='flight'?'一定係数・固定回転軸の教育用RK4計算であり、実測軌道ではありません。':'長さ・力・力積の縮尺を共有しない模式図です。'} オリジナルSVG。</figcaption>
+</figure>

@@ -1,0 +1,12 @@
+---
+import {BALL,shellImpact,airForces,flightComparison,spinParameter} from '../lib/spin';
+interface Props{kind:'impact'|'lift'|'flight';}
+const {kind}=Astro.props;
+const qA=0.5*BALL.density*Math.PI*BALL.radius**2*25**2;
+---
+<div class="table-scroll" tabindex="0" role="region" aria-label="回転と空気力の数値表。横にスクロールできます">
+{kind==='impact'&&<table><caption>薄い一様球殻・静止球、力積8.60 N·sを固定した教育用比較</caption><thead><tr><th scope="col">力積の腕 b</th><th scope="col">並進速度</th><th scope="col">角速度</th><th scope="col">回転数</th><th scope="col">回転エネルギー</th></tr></thead><tbody>{[0,0.01,0.02].map(b=>{const s=shellImpact(8.6,b);return <tr><th scope="row">{(b*100).toFixed(0)} cm</th><td>{s.speed.toFixed(2)} m/s</td><td>{s.omega.toFixed(2)} rad/s</td><td>{s.rps.toFixed(2)} 回/s</td><td>{s.rotation.toFixed(2)} J</td></tr>})}</tbody></table>}
+{kind==='lift'&&<><table><caption>瞬間の力の比較：水平速度25 m/s・無風・通常のバックスピン方向</caption><thead><tr><th scope="col">仮定した Cʟ</th><th scope="col">上向き揚力</th><th scope="col">鉛直加速度</th></tr></thead><tbody>{[0,0.1,0.2].map(cl=>{const f=airForces([25,0,0],{cd:0.25,cl,axis:[0,0,1]});return <tr><th scope="row">{cl.toFixed(2)}</th><td>{f.lift[1].toFixed(2)} N</td><td>{(f.lift[1]/BALL.mass-9.81).toFixed(2)} m/s²</td></tr>})}</tbody></table><p>この条件で鉛直合力が0となる係数は {(BALL.mass*9.81/qA).toFixed(3)}。5回/sの回転に対応するスピンパラメータは {spinParameter(5,25).toFixed(3)} ですが、それだけからCʟは決まりません。</p></>}
+{kind==='flight'&&<table><caption>一定係数の教育用RK4計算：40°・相対高さ0 m・無風・固定回転軸</caption><thead><tr><th scope="col">条件</th><th scope="col">初速度 [m/s]</th><th scope="col">Cᴅ</th><th scope="col">Cʟ</th><th scope="col">飛距離 [m]</th><th scope="col">最高点 [m]</th><th scope="col">時間 [s]</th></tr></thead><tbody>{flightComparison().map(c=><tr><th scope="row">{c.label}</th><td>{c.speed.toFixed(1)}</td><td>{c.cd.toFixed(2)}</td><td>{c.cl.toFixed(2)}</td><td>{c.range.toFixed(2)}</td><td>{c.peak.toFixed(2)}</td><td>{c.time.toFixed(2)}</td></tr>)}</tbody></table>}
+</div>
+<p class="calculation-note">質量0.43 kg・半径0.11 m。空気力の計算では密度1.20 kg/m³・重力加速度9.81 m/s²。特定選手・製品の実測値や、回転数から同定した係数ではありません。</p>

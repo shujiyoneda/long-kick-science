@@ -12,9 +12,12 @@ for(const file of pages){const html=fs.readFileSync(file,'utf8');if(html.include
   if(hash&&target.endsWith('.html')){const content=fs.readFileSync(target,'utf8');if(!content.includes(`id="${decodeURIComponent(hash)}"`))errors.push(`${file}: missing anchor ${raw}`);}
  }
 }
-const published=pages.filter(p=>/\/learn\/06-[123]\/index.html$/.test(p));
+const lessons=JSON.parse(fs.readFileSync('src/data/curriculum.json','utf8')).flatMap(c=>c.lessons);
+const publishedIds=lessons.filter(l=>l.status==='published').map(l=>l.id);
+const published=pages.filter(p=>publishedIds.some(id=>p.endsWith(`/learn/${id}/index.html`)));
 if(pages.length!==38)errors.push(`Expected 38 pages, got ${pages.length}`);
-if(published.length!==3)errors.push('Expected 3 completed lessons');
+if(published.length!==publishedIds.length)errors.push('Completed lesson count differs from curriculum');
+for(const file of published){const html=fs.readFileSync(file,'utf8');if(!html.includes('data-status="published"')||html.includes('本文は未公開です'))errors.push(`${file}: completed body missing`);}
 const planned=pages.filter(p=>p.includes('/learn/')&&!published.includes(p));
 for(const file of planned)if(!fs.readFileSync(file,'utf8').includes('本文は未公開です'))errors.push(`${file}: publication state missing`);
 if(errors.length){console.error(errors.join('\n'));process.exit(1);}console.log(`${pages.length} pages: all local links, fragments, assets and publication states verified.`);

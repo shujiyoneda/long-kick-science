@@ -4,6 +4,7 @@ export function getStaticPaths(){return lessons.map(lesson=>({params:{id:lesson.
 const {lesson:l}=Astro.props;const chapter=chapters[l.chapter-1];
 const articles=import.meta.glob<{default:any}>('../../content/lessons/*.mdx',{eager:true});
 const Article=articles[`../../content/lessons/${l.id}.mdx`]?.default;
+if(l.status==='published'&&!Article)throw new Error(`本文がない公開講座: ${l.id}`);
 const index=lessons.findIndex(x=>x.id===l.id),prev=lessons[index-1],next=lessons[index+1];
 ---
 <Base title={l.title} description={l.goal}><header class="article-header container"><nav class="breadcrumbs" aria-label="パンくず"><a href={url('chapters/')}>講座一覧</a><span>/</span><a href={url(`chapters/${chapter.id}/`)}>Chapter {chapter.id}</a><span>/</span><span>{l.level}</span></nav><div class="article-meta"><span class="eyebrow">LESSON {l.id} · {l.level}</span><span class:list={['status',{live:l.status==='published'}]}>{l.status==='published'?'公開中':'本文未公開'}</span>{l.status==='published' && <span>約{l.minutes}分</span>}</div><h1>{l.title}</h1><p class="lead">{l.goal}</p></header><div class="container article-grid"><aside class="toc"><details open><summary>{l.status==='published'?'この講座の目次':'この講座の構成'}</summary><ol>{sectionNames.map((s,i)=><li><a href={`#${sectionIds[i]}`}>{s}</a></li>)}</ol></details><a class="toc-lab" href={url('simulator/')}>飛距離を試す ↗</a></aside><article class="prose" data-status={l.status}>
