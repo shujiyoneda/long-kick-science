@@ -8,6 +8,8 @@ const sx=(x:number)=>48+x*9.5,sy=(y:number)=>290-y*9.5;
 const cases=kind==='flight'?flightComparison():[];
 ---
 <figure class="physics-figure">
+<p class="spin-diagram-hint">図は横にスクロールできます。キーボードでは図にフォーカスして左右キーで移動できます。</p>
+<div class="spin-diagram-scroll" tabindex="0" role="region" aria-label="物理図。横にスクロールできます">
 <svg viewBox={kind==='flight'?'0 0 700 420':'0 0 700 350'} role="img" aria-label={title} xmlns="http://www.w3.org/2000/svg">
 <desc>{description}</desc>
 <defs><marker id={`spin-arrow-${kind}`} markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0 0L6 3L0 6" fill="none" stroke="context-stroke" stroke-width="1.5"/></marker></defs>
@@ -36,5 +38,6 @@ const cases=kind==='flight'?flightComparison():[];
 {cases.map((c,i)=><><path d={c.points.filter((_,j)=>j%8===0||j===c.points.length-1).map((p,j)=>`${j?'L':'M'}${sx(p.x).toFixed(2)},${sy(p.y).toFixed(2)}`).join(' ')} fill="none" stroke={c.color} stroke-width="3" stroke-dasharray={c.dash}/><path d={`M${60+(i%2)*325} ${355+Math.floor(i/2)*38}h36`} stroke={c.color} stroke-width="3" stroke-dasharray={c.dash}/><text x={105+(i%2)*325} y={360+Math.floor(i/2)*38} font-size="16" fill={c.color}>{c.label}</text></>)}
 </>}
 </svg>
+</div>
 <figcaption>{title}。{description} {kind==='flight'?'一定係数・固定回転軸の教育用RK4計算であり、実測軌道ではありません。':'長さ・力・力積の縮尺を共有しない模式図です。'} オリジナルSVG。</figcaption>
 </figure>
